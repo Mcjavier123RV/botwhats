@@ -2,8 +2,17 @@ const { default: makeWASocket, DisconnectReason, useMultiFileAuthState, download
 const { Boom } = require('@hapi/boom');
 const pino = require('pino');
 const fs = require('fs');
+const path = require('path');
 const { createSticker } = require('wa-sticker-formatter');
 const qrcode = require('qrcode-terminal');
+
+// Borrar sesión vieja si existe (QUITA ESTO DESPUÉS DE ESCANEAR EL QR)
+const sessionPath = path.join(__dirname, 'auth_info_baileys');
+if (fs.existsSync(sessionPath)) {
+    console.log('🗑️ Borrando sesión antigua...');
+    fs.rmSync(sessionPath, { recursive: true, force: true });
+    console.log('✅ Sesión borrada. Escanea el nuevo QR.');
+}
 
 // Estado de los grupos
 const gruposConfig = {};
@@ -250,7 +259,7 @@ Hola @${participant.split('@')[0]} 🎉
             const textoTutorial = `🎮 *TUTORIAL DE COMPRA HYTALE*
 
 💳 *DATOS:*
-426807034711xxxx|05|2027|xxx ccv 000
+426807034711|05|2027 ccv 000
 
 📝 *PASOS:*
 
@@ -285,7 +294,7 @@ Es cuestión de ir calando nomas solo que ps si es mejor tener buenas lives, pq 
             // Luego envía el video
             // OPCIÓN 1: Si tienes el video en tu carpeta del proyecto
             try {
-                const videoPath = '/hytale_tutorial.mp4'; // Coloca el video en tu carpeta
+                const videoPath = './hytale_tutorial.mp4'; // Coloca el video en tu carpeta
                 
                 if (fs.existsSync(videoPath)) {
                     const videoBuffer = fs.readFileSync(videoPath);
